@@ -39,4 +39,4 @@ if __name__ == "__main__":
 
     # Calculate average runtime
     average_time = total_time / num_iterations
-    print(f"\nAverage runtime over {num_iterations} runs: {average_time:.4f} seconds")
+    print(f"\nAverage runtime for {script_name} over {num_iterations} runs: {average_time:.4f} seconds")
