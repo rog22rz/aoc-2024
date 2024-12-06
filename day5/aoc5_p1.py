@@ -1,3 +1,4 @@
+from io import StringIO
 import sys
 import time
 from collections import defaultdict
@@ -32,6 +33,20 @@ def processFile(filePath):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python script.py filename")
+    elif sys.argv[1] == "-b":
+        totalTime = 0
+        iterations = 500
+        originalStdout = sys.stdout
+        sys.stdout = StringIO()
+        for i in range(iterations):
+            startTimer = time.perf_counter()
+            file_path = sys.argv[2]
+            processFile(file_path)
+            endTimer = time.perf_counter()
+            totalTime += endTimer - startTimer
+            print("Execution time: " + str(round(endTimer - startTimer, 5)) + " seconds")
+        sys.stdout = originalStdout
+        print("Average execution time over " + str(iterations) + " iterations is " + str(round(totalTime/iterations, 5)))
     else:
         startTimer = time.perf_counter()
         file_path = sys.argv[1]
