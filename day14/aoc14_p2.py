@@ -3,31 +3,7 @@ import time
 
 MAP_WIDTH = 101
 MAP_HEIGHT = 103 
-ITERATIONS = 5000
-ERROR_MARGIN = 10
-
-def getSectors(points):
-    # Separate into sectors
-    nw_sector = 0
-    ne_sector = 0
-    sw_sector = 0
-    se_sector = 0
-    for x, y in points:
-        if MAP_WIDTH%2 == 1 and int(MAP_WIDTH/2) == int(x):
-            continue
-        if MAP_HEIGHT%2 == 1 and int(MAP_HEIGHT/2) == int(y):
-            continue
-        if int(x) < MAP_WIDTH/2:
-            if int(y) < MAP_HEIGHT/2:
-                nw_sector += 1
-            else:
-                sw_sector += 1
-        else:
-            if int(y) < MAP_HEIGHT/2:
-                ne_sector += 1
-            else:
-                se_sector += 1
-    return(nw_sector, ne_sector, sw_sector, se_sector)
+ITERATIONS = 20000
 
 def printMap(points):
     grid = [['.' for _ in range(MAP_WIDTH)] for _ in range(MAP_HEIGHT)] 
@@ -40,7 +16,6 @@ def printMap(points):
 def getPoint(line):
     points = line.split("=")[1].split(",")
     return (points[0], points[1])
-
 
 def processFile(filePath):
 
@@ -60,18 +35,25 @@ def processFile(filePath):
     # Move robots around
     for i in range(ITERATIONS):
         newPoints = []
+        rowsMap = {}
+        maxN = 0
+        minN = 999
         for j in range(len(points)):
             newX = (int(points[j][0]) + int(velos[j][0]))%MAP_WIDTH
             newY = (int(points[j][1]) + int(velos[j][1]))%MAP_HEIGHT
-            if newX < 0:
-                newX = MAP_WIDTH + newX
-            if newY < 0:
-                newY = MAP_WIDTH + newY
+
             newPoints.append((newX, newY))
+            keyPoint = newY
+            rowsMap[keyPoint] = rowsMap.get(keyPoint, 0) + 1
+            maxN = max(rowsMap[newY], maxN)
+            minN = min(rowsMap[newY], minN)
         points = newPoints.copy()
-        nw, ne, sw, se = getSectors(points)
-        if abs(int(nw - sw)) < ERROR_MARGIN and abs(int(ne - se)) < ERROR_MARGIN:
+
+        # Heurisitcs
+        if maxN - minN > 20:
             print("Iteration number: " + str(i))
+            print("Max: " + str(maxN))
+            print("Min: " + str(minN))
             validIteration += 1
             printMap(points)
 
